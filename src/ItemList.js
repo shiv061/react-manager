@@ -8,10 +8,12 @@ export default function ItemList({ id, items }) {
 
   return (
     <Droppable droppableId={id}>
-      {(provided, snapshot) => (
+      {(provided) => (
         <div ref={provided.innerRef}>
           {items.map((itemId, itemIdx) => {
-            return <Card key={itemId} id={itemId} index={itemIdx} />;
+            return (
+              <Card key={itemId} id={itemId} index={itemIdx} columnId={id} />
+            );
           })}
           {provided.placeholder}
           <div className="p-2 flex justify-center rounded-md shadow-2xl my-4 border_image cursor-pointer  group">
@@ -32,7 +34,7 @@ export default function ItemList({ id, items }) {
             <p
               className="text-white group-hover:text-gray-500"
               onClick={() => {
-                dispatch(openTaskModal());
+                dispatch(openTaskModal({ id }));
               }}
             >
               Add Task

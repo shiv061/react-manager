@@ -30,19 +30,28 @@ const initialState = {
     },
   ],
   tasks: {
-    I1: 'Hello',
-    I2: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. In, minus.',
-    I3: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo quae qui assumenda accusantium eveniet deserunt, eius quo quas magni earum, error delectus. Corporis natus placeat repudiandae delectus deserunt, incidunt recusandae.',
-    I4: 'Lorem ipsum dolor sit amet.',
-    I5: 'Lorem ipsum dolor sit amet.',
-    I6: 'Lorem ipsum dolor sit amet.',
-    I7: 'Lorem ss dolor sit amet.',
-    I8: 'Lorem ipsum dolor sit amet.',
-    I9: 'Lorem dsa dolor sit amet.',
-    I10: 'Lorem dsa dolor sit amet.',
+    I1: { header: 'Hello', content: '' },
+    I2: {
+      header:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. In, minus.',
+      content: '',
+    },
+    I3: {
+      header:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo quae qui assumenda accusantium eveniet deserunt, eius quo quas magni earum, error delectus. Corporis natus placeat repudiandae delectus deserunt, incidunt recusandae.',
+      content: '',
+    },
+    I4: { header: 'Lorem ipsum dolor sit amet.', content: '' },
+    I5: { header: 'Lorem ipsum dolor sit amet.', content: '' },
+    I6: { header: 'Lorem ipsum dolor sit amet.', content: '' },
+    I7: { header: 'Lorem ss dolor sit amet.', content: '' },
+    I8: { header: 'Lorem ipsum dolor sit amet.', content: '' },
+    I9: { header: 'Lorem dsa dolor sit amet.', content: '' },
+    I10: { header: 'Lorem dsa dolor sit amet.', content: '' },
   },
   modalOpen: false,
   modalType: 'task',
+  currentColumn: null,
 };
 
 export const kanbanSlice = createSlice({
@@ -103,16 +112,60 @@ export const kanbanSlice = createSlice({
     },
     setModal: (state, action) => {
       state.modalOpen = action.payload;
+      if (action.payload === false) {
+        state.currentColumn = null;
+      }
     },
-    openTaskModal: (state) => {
+    openTaskModal: (state, action) => {
       state.modalOpen = true;
       state.modalType = 'task';
+      state.currentColumn = action.payload.id;
+    },
+    setCurrentColumn: (state, action) => {
+      state.currentColumn = action.payload;
+    },
+    addTask: (state, action) => {
+      const taskId = v4();
+      const columnId = action.payload.columnId;
+      state.tasks[taskId] = {
+        header: action.payload.header,
+        content: action.payload.content,
+      };
+      const columnIdx = state.columns.findIndex((col) => col.id === columnId);
+      state.columns[columnIdx].items.push(taskId);
+      state.modalOpen = false;
+      state.currentColumn = null;
+    },
+    removeTask: (state, action) => {
+      const columnId = action.payload.columnId;
+      const taskId = action.payload.taskId;
+      const columnIdx = state.columns.findIndex((col) => col.id === columnId);
+      state.columns[columnIdx].items = state.columns[columnIdx].items.filter(
+        (it) => it !== taskId
+      );
+      delete state.tasks[taskId];
+    },
+    addColumn: (state, action) => {
+      const id = v4();
+      const title = action.payload.title;
+      state.columns.push({
+        id,
+        header: title,
+        items: [],
+      });
     },
   },
 });
 
-export const { moveCards, moveColumns, setModal, openTaskModal } =
-  kanbanSlice.actions;
+export const {
+  moveCards,
+  moveColumns,
+  setModal,
+  openTaskModal,
+  addTask,
+  removeTask,
+  addColumn,
+} = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;
 
