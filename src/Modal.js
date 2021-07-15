@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { useDispatch, useSelector } from 'react-redux';
-import { addTask, setModal } from './features/kanban/kanbanSlice';
+import { addTask, setModal, editTask } from './features/kanban/kanbanSlice';
 import Markdown from './Markdown';
 
 const customStyles = {
@@ -30,6 +30,8 @@ function AppModal() {
   const modalIsOpen = useSelector((state) => state.kanban.modalOpen);
   const modalType = useSelector((state) => state.kanban.modalType);
   const columnId = useSelector((state) => state.kanban.currentColumn);
+  const editId = useSelector((state) => state.kanban.editTaskId);
+  const editTaskData = useSelector((state) => state.kanban.tasks[editId]);
   const dispatch = useDispatch();
   function afterOpenModal() {}
 
@@ -44,6 +46,25 @@ function AppModal() {
     setMarkdownContent('');
   };
 
+  const handleEdit = () => {
+    if (!header) return;
+    dispatch(editTask({ editId, header, content: markdownContent }));
+    setHeader('');
+    setMarkdownContent('');
+  };
+
+  useEffect(() => {
+    if (editId) {
+      if (editTaskData) {
+        setHeader(editTaskData.header);
+        setMarkdownContent(editTaskData.content);
+      }
+    } else {
+      setHeader('');
+      setMarkdownContent('');
+    }
+  }, [editId, editTaskData]);
+
   const content = [
     modalType === 'task' && (
       <div key="task">
@@ -51,10 +72,10 @@ function AppModal() {
           <h3 className="text-white font-semibold text-xl">Add Task</h3>
           <span className="flex items-center">
             <button
-              onClick={handleAddTask}
+              onClick={editId ? handleEdit : handleAddTask}
               className="bg-green-800 text-white mr-4 px-2 rounded-md text-md py-1 hover:bg-green-700"
             >
-              Add
+              {editId ? 'Edit' : 'Add'}
             </button>
             <svg
               xmlns="http://www.w3.org/2000/svg"

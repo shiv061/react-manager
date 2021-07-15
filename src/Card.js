@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
-import { removeTask } from './features/kanban/kanbanSlice';
+import { openEditModal, removeTask } from './features/kanban/kanbanSlice';
 
 export default function Card({ id, index, columnId }) {
   const { tasks } = useSelector((state) => state.kanban);
@@ -18,6 +18,9 @@ export default function Card({ id, index, columnId }) {
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
+            onClick={() => {
+              dispatch(openEditModal(id));
+            }}
           >
             <p className="text-white flex-1">{taskContent}</p>
             <svg

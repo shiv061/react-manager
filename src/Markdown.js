@@ -15,11 +15,6 @@ export default function Markdown({ markdownContent, setMarkdownContent }) {
       style={{ height: '300px' }}
       renderHTML={(text) => mdParser.render(text)}
       onChange={handleEditorChange}
-      config={{
-        view: {
-          html: false,
-        },
-      }}
     />
   );
 }
